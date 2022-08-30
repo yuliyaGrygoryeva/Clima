@@ -11,7 +11,6 @@ import Foundation
 struct APIManager {
     // add your personal key
     
-    
     func fetchWeather(cityName: String) {
         let urlString = "\(weatherURL)&q\(cityName)"
         performRequest(urlString: urlString)
@@ -46,10 +45,17 @@ struct APIManager {
         let decoder = JSONDecoder()
         do {
             let decodedData = try decoder.decode(WeatherData.self, from: weatherData)
-            print(decodedData.main.temp)
-            print(decodedData.weather[0].description)
+            let id = decodedData.weather[0].id
+            let temp = decodedData.main.temp
+            let name = decodedData.name
+            
+            let weather = WeatherModel(conditionID: id, cityName: name, temperature: temp)
+            print(weather.conditionName)
+            
         } catch {
             print(error)
         }
     }
+   
+    
 }
