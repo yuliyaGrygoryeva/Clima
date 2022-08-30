@@ -8,24 +8,26 @@
 
 import UIKit
 
-class WeatherViewController: UIViewController, UITextFieldDelegate, APIManagerDelegate {
+
+class WeatherViewController: UIViewController {
 
     @IBOutlet weak var conditionImageView: UIImageView!
     @IBOutlet weak var temperatureLabel: UILabel!
     @IBOutlet weak var cityLabel: UILabel!
-    
     @IBOutlet weak var searchText: UITextField!
     
     var weatherManager = APIManager()
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         weatherManager.delegate = self
         searchText.delegate = self
-        
     }
+}
 
+// MARK: - UITextFieldDelegate
+
+extension WeatherViewController: UITextFieldDelegate {
     @IBAction func searchPressed(_ sender: Any) {
         searchText.endEditing(true)
         print(searchText.text!)
@@ -44,21 +46,20 @@ class WeatherViewController: UIViewController, UITextFieldDelegate, APIManagerDe
             textField.placeholder = "Type something"
             return false
         }
-
     }
     
     func textFieldDidEndEditing(_ textField: UITextField) {
-        
         if let city = searchText.text {
             weatherManager.fetchWeather(cityName: city)
         }
-        
         searchText.text = ""
     }
-    
+}
+
+
+extension WeatherViewController: APIManagerDelegate{
     func didUpdateWeather(_ apiManager: APIManager, weather: WeatherModel) {
         DispatchQueue.main.async {
-            
             self.conditionImageView.image = UIImage(systemName: weather.conditionName)
             self.temperatureLabel.text = weather.temperatureString
             self.cityLabel.text = weather.cityName

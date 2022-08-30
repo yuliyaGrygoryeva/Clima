@@ -11,6 +11,7 @@ import Foundation
 struct APIManager {
     // add your personal key
     
+    var weatherURL = "https://api.openweathermap.org/data/2.5/weather?q=London&appid=e330f577e3cb44224437d401a632c120"
     
     var delegate: APIManagerDelegate?
     
