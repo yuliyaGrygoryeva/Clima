@@ -11,12 +11,15 @@ import Foundation
 struct APIManager {
     // add your personal key
     
+    
+    var delegate: APIManagerDelegate?
+    
     func fetchWeather(cityName: String) {
         let urlString = "\(weatherURL)&q\(cityName)"
-        performRequest(urlString: urlString)
+        performRequest(with: urlString)
     }
     
-    func performRequest(urlString: String) {
+    func performRequest(with urlString: String) {
         // Create a URL
         if let url = URL(string: urlString) {
             
@@ -24,15 +27,19 @@ struct APIManager {
             let session = URLSession(configuration: .default)
             
             // 3. Give the session a task
-             let task =  session.dataTask(with: url) { data, responce, error in
+            let task =  session.dataTask(with: url) { data, responce, error in
                 if error != nil {
-                    print(error!)
+                    delegate?.didFailWithError(error: error!)
                     return
                 }
                 if let safeData = data {
-                    parseJSON(weatherData: safeData)
+              //      DispatchQueue.main.async {
+                        
+                        if let weather = parseJSON(safeData) {
+                            delegate?.didUpdateWeather(self, weather: weather)
+                        }
+                //    }
                     
-                  //  let dataString = String(data: safeData, encoding: .utf8)
                 }
             }
             
@@ -41,7 +48,7 @@ struct APIManager {
         }
     }
     
-    func parseJSON(weatherData: Data) {
+    func parseJSON(_ weatherData: Data) -> WeatherModel? {
         let decoder = JSONDecoder()
         do {
             let decodedData = try decoder.decode(WeatherData.self, from: weatherData)
@@ -51,11 +58,17 @@ struct APIManager {
             
             let weather = WeatherModel(conditionID: id, cityName: name, temperature: temp)
             print(weather.conditionName)
-            
+            return weather
         } catch {
-            print(error)
+            delegate?.didFailWithError(error: error)
+            return nil
         }
     }
-   
     
+    
+}
+
+protocol APIManagerDelegate {
+    func didUpdateWeather(_ apiManager: APIManager, weather: WeatherModel)
+    func didFailWithError(error: Error)
 }
