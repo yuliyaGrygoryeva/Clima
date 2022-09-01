@@ -7,18 +7,24 @@
 //
 
 import Foundation
+import CoreLocation
 
 struct APIManager {
     // add your personal key
     
-    var weatherURL = "https://api.openweathermap.org/data/2.5/weather?q=London&appid=e330f577e3cb44224437d401a632c120"
-    
+    var weatherURL = ""
     var delegate: APIManagerDelegate?
     
     func fetchWeather(cityName: String) {
         let urlString = "\(weatherURL)&q\(cityName)"
         performRequest(with: urlString)
     }
+    
+    func fetchWeather(latitude: CLLocationDegrees, longitude: CLLocationDegrees) {
+        let urlString = "\(weatherURL)&lat=\(latitude)&lon=\(longitude)"
+        performRequest(with: urlString)
+    }
+    
     
     func performRequest(with urlString: String) {
         // Create a URL
